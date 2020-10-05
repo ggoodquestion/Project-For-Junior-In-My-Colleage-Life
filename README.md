@@ -1,4 +1,4 @@
-專題報告一
+2020專題學習筆記
 ==
 ## HMM - 隱藏式馬可夫模型(Hidden Markov Model)
 
@@ -11,9 +11,9 @@ Markov Chain為一隨機過程，該過程要求具備「無記憶」的性質�
 
 >參數:
 >1. $O={o_1,o_2,…,o_T}$ 
-: states(觀測序列)
+: observations(觀測序列)
 >2. $Q={q_1,q_2,…,q_N}$ 
-: observations(隱序列，我們感興趣的事件)
+: states(隱序列，我們感興趣的事件)
 >3. $A=a_{11}...a_{ij}...a_{NN}$ 
 : transition probability matrix
    (轉移機率矩陣，紀錄當前隱藏狀態轉移到下一隱藏狀態之機率)
@@ -52,7 +52,24 @@ $$...$$
 $$=P(q_T|q_{T-1},...,q_1)P(q_{T-1}|q_{T-2},...,q_1)...P(q_2|q_1)P(q_1)$$
 $$=\prod_{t=1}^TP(q_t|q_{t-1},...,q_1)$$
 
-現在套用一階馬可夫性質
+現在套用馬可夫性質
+
+**1-th**
+
+We know,
+$$P(Q)=P(q_T|q_{T-1},...,q_1)P(q_{T-1}|q_{T-2},...,q_1)...P(q_2|q_1)P(q_1)$$
+$$\implies P(Q)=P(q_T|q_{T-1})P(q_{T-1}|q_{T-2})...P(q_2|q_1)P(q_1)$$
+$$=\prod_{t=1}^TP(q_t|q_{t-1})$$
+
+**2-th**
+$$P(Q)=P(q_T|q_{T-1},...,q_1)P(q_{T-1}|q_{T-2},...,q_1)...P(q_2|q_1)P(q_1)$$
+$$\implies P(Q)=P(q_T|q_{T-1}.q_{T-2})P(q_{T-1}|q_{T-2},q_{T-3})...P(q_3|q_2,q_1)P(q_2|q_1)P(q_1)$$
+$$=\prod_{t=1}^TP(q_t|q_{t-1},q_{t-2})$$
+
+**n-th**
+
+最後可以推得在$n$階馬可夫時
+$$P(Q)=\prod_{t=1}^TP(q_t|q_{t-1},q_{t-2},...,q_{t-n})$$
 
 #### Three fundamental problems
 >1. Likelihood : The Forward Algorithm
@@ -71,7 +88,8 @@ $$=\prod_{t=1}^TP(q_t|q_{t-1},...,q_1)$$
 > 透過一階馬可夫性質：
 > $$P(O,Q)=P(O|Q)\cdot P(Q)=\prod_{i=1}^TP(o_i|q_i)\cdot \prod_{i=1}^TP(q_i|q_{i-1})$$
 > $$\implies P(O) = \sum_QP(O,Q)=\sum_QP(O|Q)\cdot P(Q)$$
-> 得到的式子表示發生$O$的機率為找出所有$Q$的可能性並相加所有結果，但是這樣效率太低，因此我們將每個節點發生的機率記錄下來並用於下一次的計算，此稱為Forwarding Algorithm。
+> $$=\sum_Q[\prod_{t=1}^TP(o_t|q_t)\cdot P(q_1)\cdot \prod_{t=2}^TP(q_t|q_{t-1})]$$
+> 得到的式子表示發生$O$的機率為找出所有$Q$的可能性並相加所有結果，但是這種遍尋的方式效率太低，因此我們將每個節點發生的機率記錄下來並用於下一次的計算，此稱為Forwarding Algorithm。
 > 
 > 在此定義$a_t(j)$ 表示在$j$狀況下時，且觀察到$o_t$的機率
 > $$a_t(j)=P(o_1,o_2...,o_t,q_t=j|\lambda)$$
@@ -178,8 +196,7 @@ $\lambda=${$w_i,\mu_i,\sum_i$}，$i=1,...,M$
 由上述模型描述可知，若$x_i，i=1,...,N$為互相獨立之事件，則發生$X=${$x_1,...,x_N$}之相似函數可表示成
 >$P(X|\lambda)=\prod_{i=1}^{N}P(x_i|\lambda)$
 
-由於$X$是確定的，因此MLE主要就是找出使得GMM的相似
-函數值為最大時的參數$\lambda'$，也就是
+由於$X$是確定的，因此MLE主要就是找出使得GMM的相似函數值為最大時的參數$\lambda'$，也就是
 >$\lambda'=arg\max\limits_{\lambda}P(X|\lambda)$
 
 但上式對$\lambda$而言是一個非線性的方程式，無法直接最大化相似函數，所以採用EM，利用疊代的方式找出MLE的估測參數$\lambda'$。
@@ -255,10 +272,114 @@ Likelihood function $E(\lambda)$最大化的示意圖 :
 GMM建立的流程圖 : 
 >![](https://i.imgur.com/Cp9O27M.png)
 
+### 機率推演
+欲求
+>$\lambda^*=arg\max\limits_{\lambda}p(O|\lambda)$
+
+其中$O$為已知事件，$\lambda$為模型參數。
+令$Q$為，可得
+>$p(O,Q|\lambda)=\dfrac{p(O,Q,\lambda)}{p(\lambda)}=\dfrac{p(Q,(O,\lambda))}{p(\lambda)}=\dfrac{p(Q|O,\lambda)p(O,\lambda)}{p(\lambda)}=p(O|\lambda)p(Q|O,\lambda)$
+
+等式同取$\ln$，得
+>$\ln{p(O,Q|\lambda)}=\ln{[p(O|\lambda)p(Q|O,\lambda)]}$
+$\implies$ 
+$\ln{p(O|\lambda)}=\ln{p(O,Q|\lambda)-\ln{p(Q|O,\lambda)}}$
+
+等式對已知參數$\bar{\lambda}$同取期望值，得
+>$E_{Q|O,\bar{\lambda}}[\ln{p(O|\lambda)}]=E_{Q|O,\bar{\lambda}}[\ln{p(O,Q|\lambda)}-\ln{p(Q|O,\lambda)}]$ 
+
+>$\implies$
+$\sum\limits_{Q}p(Q|O,\bar{\lambda})\ln{p(O|\lambda)} = \sum\limits_{Q}p(Q|O,\bar{\lambda})\ln{p(O,Q|\lambda)} - \sum\limits_{Q}p(Q|O,\bar{\lambda})\ln{p(Q|O,\lambda)}$
+
+>$\implies$
+$\ln{p(O|\lambda)} = \sum\limits_{Q}p(Q|O,\bar{\lambda})\ln{\dfrac{p(O,(Q,\lambda))}{p(\lambda)}} - \sum\limits_{Q}p(Q|O,\bar{\lambda})\ln{\dfrac{p(Q,(O,\lambda))}{p(O,\lambda)}}$ 
+
+>$\implies$
+$\ln{p(O|\lambda)} = \sum\limits_{Q}p(Q|O,\bar{\lambda})\ln{\dfrac{p(O|Q,\lambda)p(Q,\lambda)}{p(\lambda)}} - \sum\limits_{Q}p(Q|O,\bar{\lambda})\ln{\dfrac{p(Q|O,\lambda)p(O,\lambda)}{p(O,\lambda)}}$
+
+>$\implies$
+$\ln{p(O|\lambda)} = \sum\limits_{Q}p(Q|O,\bar{\lambda})\ln{p(O|Q,\lambda)p(Q|\lambda)} - \sum\limits_{Q}p(Q|O,\bar{\lambda})\ln{p(Q|O,\lambda)}$
+
+
+***
+## Cross-Entropy(交叉熵)
+### Entropy 
+原本是用在表達化學平衡態的名詞，藉以表達原子在空間當中的分布狀況，如果原子分佈越混亂，我們則說**Entropy越高，表示資訊量越高，越多不確定性存在**，因為有更多因素去影響我們原子的分布狀況。
+>例1 : 假設隨機從一個口袋裡取硬幣，口袋裡有一個藍色的，一個紅色的，一個綠色的，一個橘色的。取出一個硬幣之後，每次問一個問題，然後做出判斷，目標是，問最少的問題，得到正確答案。其中一個最好的策略如下 : 相問是不是紅或藍，分為兩組後，再問是否為紅及是否為橘，就能找出所有的球，由於問了兩道題目，$1/4(機率) * 2道題目 * 4顆球 = 2$，平均需要問$2$道題目才能找出不同顏色的球，也就是說期望值為$2$，代表entropy。
+
+>例2 : 例1中變成了袋子中$\dfrac{1}{8}$硬幣是綠色的，$\dfrac{1}{8}$的是橘色的，$\dfrac{1}{4}$是紅色的，$\dfrac{1}{2}$是藍色的，這時最優的策略如下 : 先問是否為藍；再問是否為紅；最後問是否為橘。其中，$\dfrac{1}{2}$ 的概率是藍色，只需要$1$個問題就可以知道是或者不是，$\dfrac{1}{4}$ 的概率是紅色，需要$2$個問題，按照這個邏輯，猜中硬幣需要的問題的期望值是 $\dfrac{1}{2}*1 + \dfrac{1}{4}*2 + \dfrac{1}{8}*3 + \dfrac{1}{8}*3 = 1.75$
+
+>總結上面的例子，假設一種硬幣出現的概率是$p$，那麼猜中該硬幣的所需要的問題數是$\log_2\dfrac{1}{p}$
+
+>公式 : ㄉ(問題個數的期望值，其意義就是在最優化策略下，猜到顏色所需要的問題的個數，不確定性越高，entropy就越大)
+![](https://i.imgur.com/HchuUXc.png)
+
+### Cross-entropy
+用意是在觀測預測的機率分佈與實際機率分布的誤差範圍，就拿下圖為例就直覺說明，cross-entropy(purple line = area under the blue curve)，我們預測的機率分佈為橘色區塊，真實的機率分佈為紅色區塊，藍色的地方就是cross-entropy區塊，紫色現為計算出來的值。我們預測值與實際值差越多，也就是代表內涵的資訊量愈大，也就是不確定越多，也就是 cross-entropy 會越高。
+![](https://i.imgur.com/XEcuOch.png)
+反之，如果疊合的區塊越多，就代表不確定性越少，也就是 cross-entropy 會越小，如下圖所示。
+![](https://i.imgur.com/rUwjg56.png)
+
+>例 : 如果在例2中使用例1的策略 : \dfrac{1}{8}的概率硬幣是橘色，需要$2$個問題，\dfrac{1}{2}的概率是藍色，仍然需要$2$個問題，平均來說，需要的問題數是 $\dfrac{1}{8}*2 + \dfrac{1}{8}*2 + \dfrac{1}{4}*2 + \dfrac{1}{2}*2 = 2$。因此，在例2中使用例1的策略是一個比較差的策略。其中2是這個方案中的cross-entropy。
+
+>因此，給定一個策略，cross-entropy就是在該策略下猜中顏色所需要的問題的期望值，越好的策略，最終的cross-entropy越低。具有最低的cross-entropy的策略就是最優化策略。也就是上面定義的entropy。因此，在機器學習中，我們需要最小化cross-entropy。
+
+>公式 : (p為實際機率分布，q為預測機率分布)
+![](https://i.imgur.com/yLgynrk.png)
 
 ***
 ## DTW - 動態時間規整(Dynamic Time Warping)
+### 簡介
 給定兩向量，欲計算兩者間的距離時我們常使用歐幾里得距離(Euclidian Distance)來計算，例如欲計算$X(4,7), Y(7,11)$的距離應為
 $$D(X,Y)=\sqrt{(4-7)^2+(7-11)^2}=5$$
-但當兩向量長度不同時，顯然使用歐幾里得距離並不是個好選擇，如下圖，某些點距離另一點距離甚至比其對應歐幾里得距離的點來的更近。一般來說，假設兩向量的元素位置代表的是時間，由於兩向量時間軸可能會有所偏差，因此我們並不清楚點對點的對應關係，因此傳統的歐幾里得距離並不適合用於此情況，我們需要一套有效的運算方法，此方法為DTW，在此我們更樂意將距離稱為相似性。
+但當兩向量長度不同時，顯然使用歐幾里得距離並不是個好選擇，如下圖，某些點距離另一點距離甚至比其對應歐幾里得距離的點來的更近。一般來說，假設兩向量的元素位置代表的是時間，由於兩向量時間軸可能會有所偏差，因此我們並不清楚點對點的對應關係，因此傳統的歐幾里得距離並不適合用於此情況，我們需要一套有效的運算方法，此方法為DTW，我們稱計算出來的數值為"*DTW distance*"，在此我們更樂意將距離稱為相似性，而所謂的距離是數學上用來量化相似性所給的名稱。
 ![](https://i.imgur.com/fhFC0cL.png)
+
+### 數學描述
+#### 參數定義
+DTW的目的在於比對兩個序列的相似性，假設給定一個特徵空間(Feature Space)$F$和兩組序列$X=(x_1,x_2,...,x_N),Y=(y_1,y_2,...,y_M)\quad x_n,y_m\in F,\quad for \quad 1\leq n\leq N,\quad 1\leq m\leq M$，接著我們需要一個表(table)來記錄點與點之間的距離，在此定義$C$為一個$F$ X $F$的矩陣
+$$C(n,m)=cost \ of \ x_n \ and \ y_m$$
+一般來說當$C(n,m)$越小時表示兩點的相似度越高(*low cost*)，越大時相似度越低(*high cost*)。接著我們還需要將走過的路徑(*DTW path*)記錄下來，在此定義序列$p=(p_1,p_2,...,p_L)$，且$p_l=(n_l,m_l)\in N$ X $M \ matrix ,\quad 1\leq l \leq L$ 表示第$l$個點為$(x_{n_l},y_{m_l})$。
+
+#### 初始條件
+由於*DTW*在於對其並校正兩不同長度的序列，首先必須先將兩序列的起始位與結束位置對齊，也就是說可能會對兩序列對時間軸進行壓縮，並且時間對於點需要有單向性(*Monotonicity*)即兩序列的相似狀況不會發生順序上的對調，最後在比對的的時候必須照順序比對點不可跳過(*point by point*)才不會發生相似性遺漏的狀況，以下列出做*DTW*演算時需滿足的條件。
+
+1. 邊界條件($Boundary \ condition$)：$p_1=(1,1),p_L=(N,M)$
+2. 單向性($Monotonicity$)：$n_1\leq n_2\leq ...\leq n_L \ and \ m_1\leq m_2\leq ...\leq m_L$
+3. 依序性($Step \ size \ condition$)：$p_{l+1}-p_l\in \begin{Bmatrix} (0,1),(1,0),(1,1)\end{Bmatrix}$
+
+#### 演算過程
+定義完參數且設定好初始條件後開始要來實際演算，因為*DTW*的條件有單向性和依序性，這樣的問題符合最佳子問題的性質，可以根據前一次找到的最短路徑點繼續推算下一個的最短路徑，並且未來的改變不影響過去的結果，因此可以使用動態規劃(*Dynamic Program*)來解決*DTW*問題。
+
+定義$p^*$為最佳路徑(*optimal warping path*)
+$$p_1^*=(1,1)$$
+$$p_2^*=\arg \min_{(n,m)}\begin{Bmatrix} C(1,2),C(2,1),C(2,2) \end{Bmatrix}$$
+$$p_3^*=\arg \min_{(n,m)}\begin{Bmatrix} C(n_2,m_2+1),C(n_2+1,m_2),C(n_2+1,m_2+1) \end{Bmatrix}$$
+$$...$$
+$$p_l^*=\arg \min_{(n,m)}\begin{Bmatrix} C(n_{l-1},m_{l-1}+1),C(n_{l-1}+1,m_{l-1}),C(n_{l-1}+1,m_{l-1}+1) \end{Bmatrix}$$
+$$...$$
+$$p_L^*=(N,M)\implies stop$$
+定義$D_l$為路徑$p$上$p_1$到$p_l$的總距離，
+$$D_l=\sum_{i=1}^lC(n_i,m_i)$$
+由此我們可以歸納出*Dynamic Time Warping Algorithm*的步驟：
+
+1.Initialization
+$$p_1=(1,1)$$
+$$D_1=C(1,1)$$
+2. Rescursion
+$$p_l=\arg \min_{(n,m)}\begin{Bmatrix} C(n_{l-1},m_{l-1}+1),C(n_{l-1}+1,m_{l-1}),C(n_{l-1}+1,m_{l-1}+1) \end{Bmatrix}$$
+$$D_l=min\begin{Bmatrix} C(n_{l-1},m_{l-1}+1),C(n_{l-1}+1,m_{l-1}),C(n_{l-1}+1,m_{l-1}+1) \end{Bmatrix}\ + \ D_{l-1}$$
+3. Terminal
+$$P_L=(N,M)$$
+$$D_L=C(N,M)+D_{L-1}$$
+
+### 簡易範例
+給定$F=\begin{Bmatrix}\alpha ,\beta ,\gamma \end{Bmatrix}$ ，假設$X=(\alpha,\beta,\gamma),Y=(\alpha,\alpha,\beta,\gamma,\beta,\gamma),Z=(\alpha,\gamma,\gamma,\beta,\beta)$，定義
+$$cost \ between \ two \ point=\begin{cases}0, \ x_n=y_m \\ 1, \ x_n \neq y_m \end{cases}$$
+找出與$X$相似的序列。
+
+1. 首先初始化參數，可將$C_{X,Y}與C_{X,Z}$畫成以下兩圖，
+![](https://i.imgur.com/PECMbgS.jpg)
+可以看出$X,Y$的路徑$p_{X,Y}$與$X,Z$的路徑$p_{X,Z}$
+2. 計算Warping Distance：
+透過走過的路徑$p$算出$D_{X,Y}=1, \ D_{X,Z}=3$得出序列$Y$與序列$X$最為相似。
