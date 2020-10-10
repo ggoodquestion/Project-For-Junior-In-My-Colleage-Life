@@ -1,5 +1,7 @@
 2020專題學習筆記
 ==
+Collected by 林韋廷 蘇家駒
+
 ## HMM - 隱藏式馬可夫模型(Hidden Markov Model)
 
 ### Markov Chain(馬可夫鏈)：
@@ -305,13 +307,13 @@ $\ln{p(O|\lambda)} = \sum\limits_{Q}p(Q|O,\bar{\lambda})\ln{p(O|Q,\lambda)p(Q|\l
 ## Cross-Entropy(交叉熵)
 ### Entropy 
 原本是用在表達化學平衡態的名詞，藉以表達原子在空間當中的分布狀況，如果原子分佈越混亂，我們則說**Entropy越高，表示資訊量越高，越多不確定性存在**，因為有更多因素去影響我們原子的分布狀況。
->例1 : 假設隨機從一個口袋裡取硬幣，口袋裡有一個藍色的，一個紅色的，一個綠色的，一個橘色的。取出一個硬幣之後，每次問一個問題，然後做出判斷，目標是，問最少的問題，得到正確答案。其中一個最好的策略如下 : 相問是不是紅或藍，分為兩組後，再問是否為紅及是否為橘，就能找出所有的球，由於問了兩道題目，$1/4(機率) * 2道題目 * 4顆球 = 2$，平均需要問$2$道題目才能找出不同顏色的球，也就是說期望值為$2$，代表entropy。
+>例1 : 假設隨機從一個口袋裡取硬幣，口袋裡有一個藍色的，一個紅色的，一個綠色的，一個橘色的。取出一個硬幣之後，每次問一個問題，然後做出判斷，目標是，問最少的問題，得到正確答案。其中一個最好的策略如下 : 相問是不是紅或藍，分為兩組後，再問是否為紅及是否為橘，就能找出所有的球，由於問了兩道題目，$1/4(機率) * 2道題目 * 4顆球 = 2$，平均需要問$2$道題目才能找出不同顏色的球，也就是說期望值為$2$，代表**entropy**。
 
 >例2 : 例1中變成了袋子中$\dfrac{1}{8}$硬幣是綠色的，$\dfrac{1}{8}$的是橘色的，$\dfrac{1}{4}$是紅色的，$\dfrac{1}{2}$是藍色的，這時最優的策略如下 : 先問是否為藍；再問是否為紅；最後問是否為橘。其中，$\dfrac{1}{2}$ 的概率是藍色，只需要$1$個問題就可以知道是或者不是，$\dfrac{1}{4}$ 的概率是紅色，需要$2$個問題，按照這個邏輯，猜中硬幣需要的問題的期望值是 $\dfrac{1}{2}*1 + \dfrac{1}{4}*2 + \dfrac{1}{8}*3 + \dfrac{1}{8}*3 = 1.75$
 
 >總結上面的例子，假設一種硬幣出現的概率是$p$，那麼猜中該硬幣的所需要的問題數是$\log_2\dfrac{1}{p}$
 
->公式 : ㄉ(問題個數的期望值，其意義就是在最優化策略下，猜到顏色所需要的問題的個數，不確定性越高，entropy就越大)
+>公式 : (問題個數的期望值，其意義就是在最優化策略下，猜到顏色所需要的問題的個數，不確定性越高，entropy就越大)
 ![](https://i.imgur.com/HchuUXc.png)
 
 ### Cross-entropy
@@ -320,7 +322,7 @@ $\ln{p(O|\lambda)} = \sum\limits_{Q}p(Q|O,\bar{\lambda})\ln{p(O|Q,\lambda)p(Q|\l
 反之，如果疊合的區塊越多，就代表不確定性越少，也就是 cross-entropy 會越小，如下圖所示。
 ![](https://i.imgur.com/rUwjg56.png)
 
->例 : 如果在例2中使用例1的策略 : \dfrac{1}{8}的概率硬幣是橘色，需要$2$個問題，\dfrac{1}{2}的概率是藍色，仍然需要$2$個問題，平均來說，需要的問題數是 $\dfrac{1}{8}*2 + \dfrac{1}{8}*2 + \dfrac{1}{4}*2 + \dfrac{1}{2}*2 = 2$。因此，在例2中使用例1的策略是一個比較差的策略。其中2是這個方案中的cross-entropy。
+>例 : 如果在例2中使用例1的策略 : $\dfrac{1}{8}$的概率硬幣是橘色，需要$2$個問題，$\dfrac{1}{2}$的概率是藍色，仍然需要$2$個問題，平均來說，需要的問題數是 $\dfrac{1}{8}*2 + \dfrac{1}{8}*2 + \dfrac{1}{4}*2 + \dfrac{1}{2}*2 = 2$。因此，在例2中使用例1的策略是一個比較差的策略。其中2是這個方案中的cross-entropy。
 
 >因此，給定一個策略，cross-entropy就是在該策略下猜中顏色所需要的問題的期望值，越好的策略，最終的cross-entropy越低。具有最低的cross-entropy的策略就是最優化策略。也就是上面定義的entropy。因此，在機器學習中，我們需要最小化cross-entropy。
 
@@ -341,6 +343,9 @@ DTW的目的在於比對兩個序列的相似性，假設給定一個特徵空�
 $$C(n,m)=cost \ of \ x_n \ and \ y_m$$
 一般來說當$C(n,m)$越小時表示兩點的相似度越高(*low cost*)，越大時相似度越低(*high cost*)。接著我們還需要將走過的路徑(*DTW path*)記錄下來，在此定義序列$p=(p_1,p_2,...,p_L)$，且$p_l=(n_l,m_l)\in N$ X $M \ matrix ,\quad 1\leq l \leq L$ 表示第$l$個點為$(x_{n_l},y_{m_l})$。
 
+再來需要一個表(table)來記錄每個點累積所需最短的消耗(cost)，在這個演算法中，我們需要透過每個點所累績的的最短路徑來找到最短的DTW path，因此定義
+$$D(n,m)=\min\begin{Bmatrix}D(n-1,m),D(n,m-1),D(n-1,m-1)\end{Bmatrix}+C(n,m)$$
+
 #### 初始條件
 由於*DTW*在於對其並校正兩不同長度的序列，首先必須先將兩序列的起始位與結束位置對齊，也就是說可能會對兩序列對時間軸進行壓縮，並且時間對於點需要有單向性(*Monotonicity*)即兩序列的相似狀況不會發生順序上的對調，最後在比對的的時候必須照順序比對點不可跳過(*point by point*)才不會發生相似性遺漏的狀況，以下列出做*DTW*演算時需滿足的條件。
 
@@ -349,37 +354,38 @@ $$C(n,m)=cost \ of \ x_n \ and \ y_m$$
 3. 依序性($Step \ size \ condition$)：$p_{l+1}-p_l\in \begin{Bmatrix} (0,1),(1,0),(1,1)\end{Bmatrix}$
 
 #### 演算過程
-定義完參數且設定好初始條件後開始要來實際演算，因為*DTW*的條件有單向性和依序性，這樣的問題符合最佳子問題的性質，可以根據前一次找到的最短路徑點繼續推算下一個的最短路徑，並且未來的改變不影響過去的結果，因此可以使用動態規劃(*Dynamic Program*)來解決*DTW*問題。
+定義完參數且設定好初始條件後開始要來實際演算，因為*DTW*的條件有單向性和依序性，這樣的問題符合最佳子問題的性質，可以根據前一次找到的最短路徑點繼續推算下一個的最短路徑，並且未來的改變不影響過去的結果，因此可以使用動態規劃(*Dynamic Program*)來解決*DTW*問題。一開始我們並不知道最好的結果是什麼，而最好的結果就是最短的DTW path，也就使我們需要找到最好的$D(N,M)$，所以首先要先初始$D$，再來透果找到的$D$去backtrace找到DTW path，所以這個演算我們把它分為兩個步驟，(i)初始化$D$(ii)找到路徑序列$p$。
 
-定義$p^*$為最佳路徑(*optimal warping path*)
-$$p_1^*=(1,1)$$
-$$p_2^*=\arg \min_{(n,m)}\begin{Bmatrix} C(1,2),C(2,1),C(2,2) \end{Bmatrix}$$
-$$p_3^*=\arg \min_{(n,m)}\begin{Bmatrix} C(n_2,m_2+1),C(n_2+1,m_2),C(n_2+1,m_2+1) \end{Bmatrix}$$
-$$...$$
-$$p_l^*=\arg \min_{(n,m)}\begin{Bmatrix} C(n_{l-1},m_{l-1}+1),C(n_{l-1}+1,m_{l-1}),C(n_{l-1}+1,m_{l-1}+1) \end{Bmatrix}$$
-$$...$$
-$$p_L^*=(N,M)\implies stop$$
-定義$D_l$為路徑$p$上$p_1$到$p_l$的總距離，
-$$D_l=\sum_{i=1}^lC(n_i,m_i)$$
+
 由此我們可以歸納出*Dynamic Time Warping Algorithm*的步驟：
 
-1.Initialization
-$$p_1=(1,1)$$
-$$D_1=C(1,1)$$
+首先要先找出最佳的累積路徑距離
+
+1. Initialization
+$$D(1,1)=C(1,1)$$
 2. Rescursion
-$$p_l=\arg \min_{(n,m)}\begin{Bmatrix} C(n_{l-1},m_{l-1}+1),C(n_{l-1}+1,m_{l-1}),C(n_{l-1}+1,m_{l-1}+1) \end{Bmatrix}$$
-$$D_l=min\begin{Bmatrix} C(n_{l-1},m_{l-1}+1),C(n_{l-1}+1,m_{l-1}),C(n_{l-1}+1,m_{l-1}+1) \end{Bmatrix}\ + \ D_{l-1}$$
+$$D(n,m)=\min\begin{Bmatrix}D(n-1,m),D(n,m-1),D(n-1,m-1)\end{Bmatrix}+C(n,m)$$
 3. Terminal
-$$P_L=(N,M)$$
-$$D_L=C(N,M)+D_{L-1}$$
+$$D(N,M)=\min\begin{Bmatrix}D(N-1,M),D(N,M-1),D(N-1,M-1)\end{Bmatrix}+C(N,M)$$
+
+再來從已知的$D$找最佳路徑$p$
+
+1. Initialization
+$$p_L=(N,M)$$
+2. Recursion
+$$p_l=\arg\min_{(n,m)}\begin{Bmatrix}D(n-1,m),D(n,m-1),D(n-1,m-1)\end{Bmatrix}$$
+3. Termination
+$$p_1=(1,1)$$
 
 ### 簡易範例
 給定$F=\begin{Bmatrix}\alpha ,\beta ,\gamma \end{Bmatrix}$ ，假設$X=(\alpha,\beta,\gamma),Y=(\alpha,\alpha,\beta,\gamma,\beta,\gamma),Z=(\alpha,\gamma,\gamma,\beta,\beta)$，定義
-$$cost \ between \ two \ point=\begin{cases}0, \ x_n=y_m \\ 1, \ x_n \neq y_m \end{cases}$$
+$$C(n,m)=\begin{cases}0, \ x_n=y_m \\ 1, \ x_n \neq y_m \end{cases}$$
 找出與$X$相似的序列。
 
 1. 首先初始化參數，可將$C_{X,Y}與C_{X,Z}$畫成以下兩圖，
-![](https://i.imgur.com/PECMbgS.jpg)
-可以看出$X,Y$的路徑$p_{X,Y}$與$X,Z$的路徑$p_{X,Z}$
+以看出$X,Y$的路徑$p_{X,Y}$與$X,Z$的路徑$p_{X,Z}$
+![](https://i.imgur.com/2wVNQzc.jpg)
+![](https://i.imgur.com/pyj1Sir.jpg)
+
 2. 計算Warping Distance：
-透過走過的路徑$p$算出$D_{X,Y}=1, \ D_{X,Z}=3$得出序列$Y$與序列$X$最為相似。
+透過$D_{X,Y}(N,M)=1, \ D_{X,Z}(N,M)=3$得出序列$Y$與序列$X$最為相似。
